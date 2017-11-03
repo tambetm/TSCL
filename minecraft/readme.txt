@@ -19,13 +19,13 @@ Setup
 =====
 
 The best way is to set up separate servers for running Minecraft instances and
-for training. Minecraft server should have 2x cores the number of runners you
-use, i.e. for 10 runners it should be 20 cores. Training server should have GPU.
-If the training server has several GPUs, you can run several parallel training
-sessions from the same machine, but each should have separate server for
-Minecraft instances. For example to run 3 training sessions in parallel with 10
-runners each, you need one machine with 3 GPUs plus 3 machines with 20 CPU cores
-each.
+for training. Given the number of runners you are using, Minecraft server should
+have twice as many cores, i.e. for 10 runners it should be 20 cores. Training
+server should have GPU. If the training server has several GPUs, you can run
+several parallel training sessions on the same machine, but each should have
+separate server for Minecraft instances. For example to run 3 training sessions
+in parallel with 10 runners each, you need one machine with 3 GPUs plus 3
+machines with 20 CPU cores each.
 
 Minecraft installation
 ======================
@@ -43,10 +43,10 @@ cd tscl
 
 # start Minecraft container, it will be downloaded automatically
 ./create_minecraft_envs.sh 10
-# you could also try 4 instead of 10
+# you could also try 4 runners instead of 10
 
 # use following to kill Minecraft processes
-#./kill_minecraft_envs.sh 10
+./kill_minecraft_envs.sh 10
 
 Trainer installation
 ====================
@@ -66,15 +66,24 @@ sudo apt-get install cuda=8.0.61-1
 sudo dpkg -i libcudnn6_6.0.21-1+cuda8.0_amd64.deb
 sudo dpkg -i libcudnn6-dev_6.0.21-1+cuda8.0_amd64.deb
 
+# add following lines to your .bashrc
+export PATH=/usr/local/cuda/bin${PATH:+:${PATH}
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64\
+  ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
 # other dependencies
+sudo apt-get install libboost-all-dev -y
+sudo apt-get install libxerces-c3.1
 sudo apt-get install python3-pip -y
 pip3 install opencv-contrib-python
 pip3 install gym
+pip3 install pygame
 pip3 install git+https://github.com/tambetm/minecraft-py35-ubuntu1604.git
 # alternatively: pip3 install git+https://github.com/tambetm/minecraft-py.git
 pip3 install git+https://github.com/tambetm/gym-minecraft
 pip3 install tensorflow-gpu
 pip3 install keras
+pip3 install h5py
 
 # upload the code and unzip it
 unzip tscl.zip
@@ -129,7 +138,7 @@ Troubleshooting
 ===============
 
 - If the trainer seems stuck, make sure Minecraft server and trainer have all
-   ports open both ways. Malmo makes new connections both ways.
+  ports open both ways. Malmo makes new connections both ways.
 - Make sure you have the latest versions of all packages. As of November 2017
   you will have least trouble, if you use Ubuntu 16.04, built-in Python 3.5,
   CUDA 8.0 with cuDNN 6.0 and pip install tensorflow-gpu. Start with clean
