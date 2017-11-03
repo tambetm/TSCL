@@ -134,6 +134,20 @@ Running experiments
 # Only last task
 ./run_minecraft_curriculum5_last.sh curriculum5_last_0 --num_runners 10 --host <ip>
 
+Evaluation
+==========
+
+To see the agent behavior:
+
+# create local Minecraft instance
+./create_minecraft_envs.sh 1
+# load the last weights for label basic_0
+python run_minecraft.py --display --client_resize eval basic_0
+# alternative: long version
+python run_minecraft.py --load_mission missions/bridgegap15x15.xml \
+  --load_weights logs/minecraft/curriculum5_manual_0/weights_2500000.hdf5 \
+  --display --client_resize eval curriculum5_manual_0
+
 Troubleshooting
 ===============
 
