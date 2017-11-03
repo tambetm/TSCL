@@ -142,11 +142,13 @@ To see the agent behavior:
 # create local Minecraft instance
 ./create_minecraft_envs.sh 1
 # load the last weights for label basic_0
-python run_minecraft.py --display --client_resize eval basic_0
+python run_minecraft.py --display --client_resize --skip_steps 0 eval basic_0
 # alternative: long version
 python run_minecraft.py --load_mission missions/bridgegap15x15.xml \
   --load_weights logs/minecraft/curriculum5_manual_0/weights_2500000.hdf5 \
-  --display --client_resize eval curriculum5_manual_0
+  --display --client_resize --skip_steps 0 eval curriculum5_manual_0
+# NB! Before doing evaluation change MsPerTick in corresponding XML file to 50,
+# otherwise it is too fast. Don't forget to change it back for training!
 
 Troubleshooting
 ===============
