@@ -4,7 +4,7 @@ Dependencies
 ============
 
  * Ubuntu 16.04
- * Python 3.4+
+ * Python 3.5
  * Numpy
  * OpenCV
  * OpenAI Gym
@@ -12,34 +12,37 @@ Dependencies
  * minecraft-py
  * Keras 2
  * Tensorflow 0.12+
- * CUDA 8.0
- * Docker
+ * CUDA 8.0, cuDNN 6.0
+ * Docker 0.11+
 
 Setup
 =====
 
-The best way is to set up separate servers for running Minecraft instances and
-for training. Given the number of runners you are using, Minecraft server should
-have twice as many cores, i.e. for 10 runners it should be 20 cores. Training
-server should have GPU. If the training server has several GPUs, you can run
-several parallel training sessions on the same machine, but each should have
-separate server for Minecraft instances. For example to run 3 training sessions
-in parallel with 10 runners each, you need one machine with 3 GPUs plus 3
-machines with 20 CPU cores each.
+The best way is to set up separate server for running Minecraft instances and
+separate server for training. Given the number of runners you are using, 
+Minecraft server should have twice as many cores, i.e. for 10 runners it should
+have 20 cores. Training server should have a GPU. If the training server has 
+several GPUs, you can run several training sessions in parallel on the same 
+machine, but each should have separate server for Minecraft instances. For 
+example to run 4 training sessions in parallel with 10 runners each, you need 
+one machine with 4 GPUs plus 4 machines with 20 CPU cores each. The training
+is somewhat sensitive to latencies, so put training and Minecraft machines to
+the same network and make sure nothing else consumes CPU cycles on those 
+machines.
 
 Minecraft installation
 ======================
 
-For least headaches use Ubuntu 16.04.
+For the least headaches use Ubuntu 16.04.
 
 # install Docker
 sudo apt-get install docker.io -y
 sudo adduser yourusername docker
-# reconnect to server for the new group to take effect
+# reconnect to the server for the new group to take effect
 
-# upload the code and unzip it
-unzip tscl.zip
-cd tscl
+# clone the repository
+git clone https://github.com/tambetm/TSCL.git
+cd TSCL/minecraft
 
 # start Minecraft container, it will be downloaded automatically
 ./create_minecraft_envs.sh 10
@@ -51,8 +54,8 @@ cd tscl
 Trainer installation
 ====================
 
-For least headaches use Ubuntu 16.04. Before any other steps, make sure you have
-CUDA and cuDNN installed. We suggest to install them from Ubuntu packages.
+For the least headaches use Ubuntu 16.04. Start by installing CUDA and cuDNN,
+we suggest installing them from Ubuntu packages.
 
 # CUDA installation
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.61-1_amd64.deb
@@ -73,7 +76,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64\
 
 # other dependencies
 sudo apt-get install libboost-all-dev -y
-sudo apt-get install libxerces-c3.1
+sudo apt-get install libxerces-c3.1 -y
 sudo apt-get install python3-pip -y
 pip3 install opencv-contrib-python
 pip3 install gym
@@ -85,9 +88,9 @@ pip3 install tensorflow-gpu
 pip3 install keras
 pip3 install h5py
 
-# upload the code and unzip it
-unzip tscl.zip
-cd tscl
+# clone the repository
+git clone https://github.com/tambetm/TSCL.git
+cd TSCL/minecraft
 
 Testing
 =======
@@ -131,7 +134,7 @@ Running experiments
 # Uniform sampling
 ./run_minecraft_curriculum5_uniform.sh curriculum5_uniform_0 --num_runners 10 --host <ip>
 
-# Only last task
+# Only the last task
 ./run_minecraft_curriculum5_last.sh curriculum5_last_0 --num_runners 10 --host <ip>
 
 Evaluation
@@ -141,13 +144,13 @@ To see the agent behavior:
 
 # create local Minecraft instance
 ./create_minecraft_envs.sh 1
-# load the last weights for label basic_0
+# run basic7x7 mission (default) and load the last weights for label basic_0
 python run_minecraft.py --display --client_resize --skip_steps 0 eval basic_0
-# alternative: long version
+# run bridgegap15x15 mission and load weights for curriculum5_manual_0 label
 python run_minecraft.py --load_mission missions/bridgegap15x15.xml \
   --load_weights logs/minecraft/curriculum5_manual_0/weights_2500000.hdf5 \
   --display --client_resize --skip_steps 0 eval curriculum5_manual_0
-# NB! Before doing evaluation change MsPerTick in corresponding XML file to 50,
+# NB! Before doing evaluation change <MsPerTick> in corresponding XML file to 50,
 # otherwise it is too fast. Don't forget to change it back for training!
 
 Troubleshooting
